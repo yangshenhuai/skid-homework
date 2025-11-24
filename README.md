@@ -6,6 +6,10 @@
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcubewhy%2Fskid-homework)
 
+## 警告: 破坏性修改
+
+我们已经将服务迁移到 Next.js, 部署时请注意配置差异.
+
 ## 安全提示
 
 Skid-Homework 不会要求你下载桌面软件, 一切东西都在浏览器内运行

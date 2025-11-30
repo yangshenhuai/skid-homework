@@ -479,7 +479,7 @@ export default function SolutionsArea() {
                           </Collapsible>
                         )}
 
-                        {(entry.solutions.status === "processing" ||
+                        {(entry.solutions.status !== "success" ||
                           entry.solutions.streamedOutput) && (
                           <StreamingOutputDisplay
                             title={t("streaming.title")}

@@ -53,11 +53,28 @@ import { InfoTooltip } from "../InfoTooltip";
 import { QWEN_TOKEN_URL } from "@/lib/qwen";
 import { useQwenHintAutoToggle } from "@/hooks/useQwenHintAutoToggle";
 import ShareAISourceDialog from "../dialogs/settings/ShareAISourceDialog";
+import Link from "next/link";
 
 const DEFAULT_BASE_BY_PROVIDER: Record<AiProvider, string> = {
   gemini: DEFAULT_GEMINI_BASE_URL,
   openai: DEFAULT_OPENAI_BASE_URL,
 };
+
+function BackButton() {
+  const { t } = useTranslation("commons", {
+    keyPrefix: "settings-page",
+  });
+
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row">
+      <Link href="/" className="w-full sm:flex-1">
+        <Button className="w-full">
+          {t("back")} <Kbd>ESC</Kbd>
+        </Button>
+      </Link>
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation("commons", {
@@ -409,11 +426,7 @@ export default function SettingsPage() {
       <div className="mx-auto max-w-3xl space-y-8 p-4 md:p-8">
         <h1 className="text-2xl font-bold tracking-tight">{t("heading")}</h1>
 
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button className="w-full sm:flex-1" onClick={handleBack}>
-            {t("back")} <Kbd>ESC</Kbd>
-          </Button>
-        </div>
+        <BackButton />
 
         <Card>
           <CardHeader>
@@ -871,9 +884,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Button className="w-full" onClick={handleBack}>
-          {t("back")} <Kbd>ESC</Kbd>
-        </Button>
+        <BackButton />
 
         <AddAISourceDialog open={addDialogOpen} onChange={setAddDialogOpen} />
       </div>

@@ -695,7 +695,7 @@ export default function ChatPage() {
             <div className="ml-auto flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link href="/settings">
+                  <Link href="/settings?from=/chat">
                     <Button
                       variant="ghost"
                       size="icon"

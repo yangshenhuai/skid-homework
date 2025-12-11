@@ -44,7 +44,6 @@ function StepExplanation({
   steps: ExplanationStep[] | null | undefined;
 }) {
   const [visibleStepCounter, setVisibleStepCounter] = useState(1);
-  const [hasMoreHints, setHasMoreHints] = useState(steps?.length !== 0);
 
   const visibleSteps = useMemo(() => {
     return steps?.slice(0, visibleStepCounter);
@@ -53,7 +52,6 @@ function StepExplanation({
   const nextHint = () => {
     if (visibleStepCounter >= (steps?.length ?? 0)) {
       // no more available steps
-      setHasMoreHints(false);
       return;
     }
     setVisibleStepCounter((c) => c + 1);
@@ -72,7 +70,10 @@ function StepExplanation({
         );
       }) ?? "No steps available."}
 
-      <Button onClick={nextHint} disabled={!hasMoreHints}>
+      <Button
+        onClick={nextHint}
+        disabled={visibleStepCounter >= (steps?.length ?? 0)}
+      >
         Hint me ({visibleSteps?.length}/{steps?.length}) <Kbd>C</Kbd>
       </Button>
     </>

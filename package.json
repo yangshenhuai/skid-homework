@@ -60,6 +60,7 @@
     "react-markdown": "^10.1.0",
     "react-photo-view": "^1.2.7",
     "react-qr-code": "^2.0.18",
+    "react-zoom-pan-pinch": "^3.7.0",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",

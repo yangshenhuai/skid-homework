@@ -1,4 +1,5 @@
 import mermaid from "mermaid";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { useEffect, useRef } from "react";
 
 export type MermaidDiagramProps = {
@@ -26,8 +27,21 @@ export default function MermaidDiagram({ code }: MermaidDiagramProps) {
   }
 
   return (
-    <div ref={ref} className="mermaid">
-      {code}
+    <div className="w-full h-full">
+      <style jsx global>{`
+        .react-transform-wrapper,
+        react-transform-component {
+          width: 100%;
+          height: 100%;
+        }
+      `}</style>
+      <TransformWrapper>
+        <TransformComponent>
+          <div ref={ref} className="mermaid">
+            {code}
+          </div>
+        </TransformComponent>
+      </TransformWrapper>
     </div>
   );
 }

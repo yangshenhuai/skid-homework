@@ -17,7 +17,6 @@ export const processImage = async (
     }
 
     const waitForOpenCV = () => {
-      // ✅ wasm ready check (THIS is the key)
       if (cv.Mat) {
         run();
       } else {
@@ -131,7 +130,6 @@ export const processImage = async (
       img.src = originalUrl;
     };
 
-    // 🚀 start here
     waitForOpenCV();
   });
 };

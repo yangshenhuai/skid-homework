@@ -39,39 +39,62 @@ export const processImage = async (
         let src: any = null;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let dst: any = null;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let bg: any = null;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let kernelSmall: any = null;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let kernelBig: any = null;
 
         try {
           src = cv.imread(img);
           dst = new cv.Mat();
+          bg = new cv.Mat();
 
+          // 1. Convert to Grayscale
           cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY);
 
-          const ksize = new cv.Size(5, 5);
-          cv.GaussianBlur(src, src, ksize, 0, 0, cv.BORDER_DEFAULT);
-
-          const kernel = cv.getStructuringElement(
+          // 2. Tiny Denoise (High Frequency Removal)
+          // Remove small specks/noise (salt-and-pepper noise)
+          kernelSmall = cv.getStructuringElement(
             cv.MORPH_RECT,
             new cv.Size(3, 3),
           );
-          cv.morphologyEx(src, src, cv.MORPH_CLOSE, kernel);
-          cv.morphologyEx(src, src, cv.MORPH_OPEN, kernel);
+          // Close: fills small black holes
+          cv.morphologyEx(src, src, cv.MORPH_CLOSE, kernelSmall);
+          // Open: removes small white noise
+          cv.morphologyEx(src, src, cv.MORPH_OPEN, kernelSmall);
 
+          // 3. Shadow Removal / Illumination Correction (Low Frequency Processing)
+          // We estimate the background (low freq) using a large kernel.
+          // A size of 40-50 is usually good for A4 documents to ignore text but capture shadows.
+          kernelBig = cv.getStructuringElement(
+            cv.MORPH_RECT,
+            new cv.Size(50, 50),
+          );
+
+          // Calculate the background (shading)
+          cv.morphologyEx(src, bg, cv.MORPH_CLOSE, kernelBig);
+
+          // Divide source by background to flatten illumination
+          // Formula: dst = (src / bg) * 255
+          cv.divide(src, bg, dst, 255, -1);
+
+          // 4. Binarization (Thresholding)
+          // Now that shadows are gone, we can safely binarize.
+          // Using adaptive threshold to handle any remaining local variations.
           cv.adaptiveThreshold(
-            src,
-            dst,
+            dst, // Input is the shadow-removed image
+            dst, // Output
             255,
             cv.ADAPTIVE_THRESH_GAUSSIAN_C,
             cv.THRESH_BINARY,
-            21,
-            10,
+            15, // Block size (smaller is finer, since shadows are already gone)
+            10, // Constant C (contrast tuning)
           );
 
           const outputCanvas = document.createElement("canvas");
           cv.imshow(outputCanvas, dst);
-
-          src.delete();
-          dst.delete();
-          URL.revokeObjectURL(originalUrl);
 
           outputCanvas.toBlob(
             (blob) => {
@@ -93,10 +116,15 @@ export const processImage = async (
             1,
           );
         } catch (err) {
+          reject(err);
+        } finally {
+          // Clean up memory (Very Important in OpenCV.js)
           if (src) src.delete();
           if (dst) dst.delete();
+          if (bg) bg.delete();
+          if (kernelSmall) kernelSmall.delete();
+          if (kernelBig) kernelBig.delete();
           URL.revokeObjectURL(originalUrl);
-          reject(err);
         }
       };
 

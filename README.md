@@ -7,7 +7,15 @@
 符合人体工程学设计、人工智能驱动的作业助手
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcubewhy%2Fskid-homework)
-[Telegram Group](https://t.me/earthsworth)
+
+## 和我们一起交流
+
+我们有 Telegram 群组和 GitHub discussions
+
+可以使用下方链接加入
+
+- [Telegram Group](https://t.me/earthsworth) (仅接受SFW内容)
+- [GitHub 讨论区](https://github.com/cubewhy/skid-homework/discussions)
 
 ## 警告: 破坏性修改
 

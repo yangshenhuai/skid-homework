@@ -6,7 +6,7 @@ Ergonomically designed, AI-powered homework solver
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcubewhy%2Fskid-homework)
 
-[Telegram Group](https://t.me/earthsworth)
+[Telegram Group](https://t.me/earthsworth) (SFW content, ZH/EN Only)
 
 ## Why SkidHomework
 

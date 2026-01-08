@@ -1,22 +1,20 @@
 import OpenAI from "openai";
 import type {
   ChatCompletionMessageParam,
-  ChatCompletionTool,
 } from "openai/resources/chat/completions";
 import type { AiChatMessage } from "./chat-types";
 import { BaseAiClient } from "./base-client";
 import { base64Decoder } from "@/utils/encoding";
 
 export type OpenAiModel = {
-  name: string;
-  displayName: string;
+    name: string;
+    displayName: string;
 };
 
 const DEFAULT_OPENAI_ROOT = "https://api.openai.com/v1";
 
 function normalizeBaseUrl(baseUrl?: string) {
-  const normalized = (baseUrl ?? DEFAULT_OPENAI_ROOT).replace(/\/$/, "");
-  return normalized;
+    return (baseUrl ?? DEFAULT_OPENAI_ROOT).replace(/\/$/, "");
 }
 
 export class OpenAiClient extends BaseAiClient {
@@ -38,8 +36,6 @@ export class OpenAiClient extends BaseAiClient {
     media: string,
     mimeType: string,
     prompt?: string,
-    // replacing with gpt-5.2 as the default model since GPT-4o and older models are retiring.
-    // see https://openai.com/index/retiring-gpt-4o-and-older-models/
     model = "gpt-5.2",
     callback?: (text: string) => void,
     options?: { onlineSearch?: boolean },
@@ -89,9 +85,7 @@ export class OpenAiClient extends BaseAiClient {
         let text: string;
         try {
           text = await base64Decoder(media, charset);
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (err) {
-          // Fallback to utf-8 if the specified charset is not supported by TextDecoder
+        } catch {
           text = await base64Decoder(media, "utf-8");
         }
         contentParts.push({
@@ -108,7 +102,10 @@ export class OpenAiClient extends BaseAiClient {
       content: contentParts,
     });
 
-    return this._executeStream(model, messages, callback, options);
+    if (options?.onlineSearch) {
+      return this._executeResponsesStream(model, messages, callback, options);
+    }
+    return this._executeStream(model, messages, callback);
   }
 
   /**
@@ -149,47 +146,98 @@ export class OpenAiClient extends BaseAiClient {
       });
     }
 
-    return this._executeStream(model, openAiMessages, callback, options);
+    if (options?.onlineSearch) {
+      return this._executeResponsesStream(model, openAiMessages, callback, options);
+    }
+    return this._executeStream(model, openAiMessages, callback);
+  }
+
+  private async _executeStream(
+      model: string,
+      messages: ChatCompletionMessageParam[],
+      callback?: (text: string) => void,
+  ): Promise<string> {
+      const stream = await this.client.chat.completions.create({
+          model,
+          messages,
+          stream: true,
+      });
+
+      let aggregated = "";
+
+      for await (const chunk of stream) {
+          const delta = chunk.choices[0]?.delta?.content || "";
+
+          if (delta) {
+              aggregated += delta;
+              callback?.(delta);
+          }
+      }
+
+      return aggregated.trim();
   }
 
   /**
-   * Internal helper to handle the streaming response from OpenAI.
+   * Streaming helper using the Responses API to support web search.
    */
-  private async _executeStream(
-    model: string,
-    messages: ChatCompletionMessageParam[],
-    callback?: (text: string) => void,
-    options?: { onlineSearch?: boolean },
+  private async _executeResponsesStream(
+      model: string,
+      messages: ChatCompletionMessageParam[],
+      callback?: (text: string) => void,
+      options?: { onlineSearch?: boolean },
   ): Promise<string> {
-    const stream = await this.client.chat.completions.create({
-      model,
-      messages,
-      stream: true,
-      // SDK types may not yet include web_search; cast to any to allow passthrough.
-      tools: options?.onlineSearch
-        ? ([{ type: "web_search" }] as unknown as ChatCompletionTool[])
-        : undefined,
-    });
+      // Choose the correct web search tool name for the model family.
+      const toolType = model.includes("4.1") || model.includes("4o") ? "web_search_preview" : "web_search";
 
-    let aggregated = "";
+      const toolsUsed = options?.onlineSearch ? [{type: toolType}] : undefined;
+      let stream: AsyncIterable<{ type: string; delta?: string }>;
 
-    for await (const chunk of stream) {
-      const delta = chunk.choices[0]?.delta?.content || "";
-      if (delta) {
-        aggregated += delta;
-        callback?.(delta);
+      try {
+          // Type assertion to bypass missing definitions if any
+          const responsesApi = (this.client as unknown as { responses: { create: (opts: unknown) => Promise<AsyncIterable<{ type: string; delta?: string }>> } }).responses;
+          stream = await responsesApi.create({
+              model,
+              tools: toolsUsed,
+              stream: true,
+              input: messages
+          });
+      } catch (err) {
+          const message = (err as Error)?.message ?? "";
+          // Graceful fallback: if the model rejects web search, retry without it.
+          const notSupported =
+              message.includes("not supported") ||
+              message.includes("web search options not supported") ||
+              message.includes("Web search options not supported");
+          if (options?.onlineSearch && notSupported) {
+              console.warn(
+                  `Web search not supported for model ${model}; falling back without search.`,
+              );
+              return this._executeStream(model, messages, callback);
+          }
+          throw err;
       }
-    }
+      let aggregated = "";
 
-    return aggregated.trim();
+      // Iterate over the Server-Sent Events
+      for await (const event of stream) {
+          if (event.type === 'response.output_text.delta') {
+              const delta = event.delta;
+
+              if (delta) {
+                  aggregated += delta;
+                  callback?.(delta);
+              }
+          }
+      }
+      return aggregated.trim();
   }
 
   async getAvailableModels(): Promise<OpenAiModel[]> {
-    const response = await this.client.models.list();
+      const response = await this.client.models.list();
 
-    return response.data.map((model) => ({
-      name: model.id,
-      displayName: model.id,
-    }));
+      return response.data.map((model) => ({
+          name: model.id,
+          displayName: model.id,
+      }));
   }
 }

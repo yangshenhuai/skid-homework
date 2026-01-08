@@ -374,6 +374,7 @@ interface Resources {
           "search": "搜索模型...",
           "unknown": "未知模型（{{name}}）"
         },
+        "show-selector-in-scanner": "在扫描界面显示模型选择以快速切换模型",
         "title": "模型配置"
       },
       "openai": {
@@ -486,6 +487,7 @@ interface Resources {
         "desc": "针对支持的提供商调整高级思考设置。",
         "online-search": {
           "desc": "在需要时允许助手调用联网搜索工具。",
+          "show-toggle-in-scanner": "在扫描界面显示联网搜索按钮以快速切换",
           "title": "联网搜索",
           "toggle": "启用联网搜索"
         },

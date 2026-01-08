@@ -69,6 +69,12 @@ export interface SettingsState {
   setClearDialogOnSubmit: (state: boolean) => void;
   onlineSearchEnabled: boolean;
   setOnlineSearchEnabled: (state: boolean) => void;
+
+  showModelSelectorInScanner: boolean;
+  setShowModelSelectorInScanner: (state: boolean) => void;
+
+  showOnlineSearchInScanner: boolean;
+  setShowOnlineSearchInScanner: (state: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -85,6 +91,8 @@ export const useSettingsStore = create<SettingsState>()(
       devtoolsEnabled: false,
       clearDialogOnSubmit: true,
       onlineSearchEnabled: false,
+      showModelSelectorInScanner: false,
+      showOnlineSearchInScanner: false,
 
       setImageEnhancement: (state) => set({ imageEnhancement: state }),
       setShowQwenHint: (state) => set({ showQwenHint: state }),
@@ -120,6 +128,10 @@ export const useSettingsStore = create<SettingsState>()(
       setDevtoolsState: (state) => set({ devtoolsEnabled: state }),
       setClearDialogOnSubmit: (state) => set({ clearDialogOnSubmit: state }),
       setOnlineSearchEnabled: (state) => set({ onlineSearchEnabled: state }),
+      setShowModelSelectorInScanner: (state) =>
+        set({ showModelSelectorInScanner: state }),
+      setShowOnlineSearchInScanner: (state) =>
+        set({ showOnlineSearchInScanner: state }),
     }),
     {
       name: "skidhw-storage",
@@ -136,6 +148,8 @@ export const useSettingsStore = create<SettingsState>()(
         devtools: state.devtoolsEnabled,
         clearDialogOnSubmit: state.clearDialogOnSubmit,
         onlineSearchEnabled: state.onlineSearchEnabled,
+        showModelSelectorInScanner: state.showModelSelectorInScanner,
+        showOnlineSearchInScanner: state.showOnlineSearchInScanner,
       }),
       version: 8,
       migrate: (persistedState, version) => {
@@ -167,6 +181,12 @@ export const useSettingsStore = create<SettingsState>()(
           onlineSearchEnabled:
             (data as { onlineSearchEnabled?: boolean }).onlineSearchEnabled ??
             false,
+          showModelSelectorInScanner:
+            (data as { showModelSelectorInScanner?: boolean })
+              .showModelSelectorInScanner ?? false,
+          showOnlineSearchInScanner:
+            (data as { showOnlineSearchInScanner?: boolean })
+              .showOnlineSearchInScanner ?? false,
         };
       },
     },

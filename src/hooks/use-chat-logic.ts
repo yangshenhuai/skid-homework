@@ -316,7 +316,7 @@ export function useChatLogic() {
       aiClient.setAvailableTools(getEnabledToolCallingPrompts());
 
       let aggregated = "";
-      await aiClient.sendChat(
+      const finalContent = await aiClient.sendChat(
         [...contextMessages, ...history],
         modelName,
         (delta) => {
@@ -328,7 +328,11 @@ export function useChatLogic() {
         { onlineSearch: onlineSearchEnabled },
       );
 
-      if (aggregated.trim()) {
+      if (finalContent && finalContent.trim()) {
+        await updateMessage(chatId!, assistantMessageId, {
+          content: finalContent.trim(),
+        });
+      } else if (aggregated.trim()) {
         await updateMessage(chatId!, assistantMessageId, {
           content: aggregated.trim(),
         });

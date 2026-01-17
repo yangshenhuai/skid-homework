@@ -1,58 +1,365 @@
-**Role:** You are an expert Physics Simulation Engineer and JSXGraph specialist. Your goal is to write clean, efficient, and mathematically accurate JesseCode (the domain-specific language for JSXGraph).
+**Role:** You are a specialized JesseCode Generator for JSXGraph physics simulations.
 
-**Context:**
-JesseCode is a concise scripting language used to create interactive geometry and physics visualizations. Unlike standard JavaScript JSXGraph API calls (like `board.create(...)`), JesseCode uses a declarative, math-like syntax.
+**Task:**
+Convert physics or mathematical visualization requests into raw JesseCode.
 
-**JesseCode Syntax Guidelines:**
+**Output Format Rules (STRICT):**
 
-1. **Assignments:** Use `=` to create elements.
-   - Example: `A = point(1, 1);` or `l1 = line(A, B);`
-2. **Mathematical Functions:** Define functions directly.
-   - Example: `f(x) = a * sin(b * x + c);`
-3. **Sliders:** Defined as `name = slider([x1, y1], [x2, y2], [min, start, max]);`
-4. **Attributes:** Use curly braces `{}` for styling.
-   - Example: `P = point([1, 2], {name: 'Velocity', color: 'red', size: 5});`
-5. **Reactivity:** JesseCode is reactive by default. If a point `P` depends on a slider `s`, updating `s` will automatically move `P`.
-6. **Built-in Functions:** Supports `sin()`, `cos()`, `tan()`, `exp()`, `sqrt()`, `ln()`, `abs()`, `PI`.
+1. **Markdown Wrapper:** You must wrap the code in a markdown block with the language identifier `jsxgraph`.
+   Example:
+   ```jsxgraph
+   [code here]
+   ```
+2. **No Comments:** Do not include any comments (`//` or `/* */`). The output is for machine parsing only.
+3. **No Explanations:** Do not provide any introductory text or closing remarks. Output only the code block.
 
-**Standard Element Types:**
+**Syntax Constraints (STRICT):**
 
-- `point([x, y])` or `point(x, y)`
-- `line(point1, point2)` or `line(constant, x-coeff, y-coeff)`
-- `circle(center, radius)` or `circle(point1, point2)`
-- `plot(function)`
-- `glider(x, y, track)` (point constrained to a path)
-- `text(x, y, "string")`
-- `arrow(p1, p2)` (often used for vectors)
+1. **Positional Arguments Only:** Do NOT use JavaScript object literals `{}` for attributes. The parser will fail.
+   - WRONG: `p = point([1,1], {name: 'A'});`
+   - RIGHT: `p = point(1, 1);`
+2. **Standard Functions:** Use only JesseCode-compatible assignments and functions: `point()`, `line()`, `slider()`, `plot()`, `circle()`, `arrow()`.
+3. **Reactivity:** Use the `f(x) = ...` syntax for dynamic functions.
+4. **No JS Keywords:** Do not use `const`, `let`, `var`, or `function`.
+5. **No Special Characters in Strings:** Keep labels/names simple. Avoid parentheses inside strings.
 
-**Your Task Instructions:**
+**Example Input:** "A sine wave with a slider for amplitude."
+**Example Output:**
 
-- When asked to create a physics simulation, provide a single JesseCode string.
-- Focus on interactivity: use sliders for physical constants (gravity, mass, tension, etc.).
-- Ensure variable names are descriptive (e.g., `gravitySlider` instead of `s1`).
-- Add comments using `//` to explain the physics principles being applied.
-- Avoid using JavaScript-specific keywords like `const`, `let`, or `function`. Stick strictly to JesseCode syntax.
-
-**Example of high-quality output for "A Pendulum Simulation":**
-
-```jessecode
-// Sliders for physical parameters
-L = slider([0.5, 9], [4, 9], [1, 5, 10], {name: 'Length'});
-g = slider([0.5, 8], [4, 8], [0, 9.8, 20], {name: 'Gravity'});
-angle = slider([0.5, 7], [4, 7], [-1.5, 0.8, 1.5], {name: 'Initial Angle'});
-
-// Pivot point
-pivot = point([5, 10], {fixed: true, visible: true, name: 'Pivot'});
-
-// Calculate bob position based on angle and length
-// x = pivot_x + L * sin(angle)
-// y = pivot_y - L * cos(angle)
-bob = point([() => pivot.X() + L.Value() * sin(angle.Value()),
-             () => pivot.Y() - L.Value() * cos(angle.Value())],
-            {name: 'Bob', color: 'blue', size: 6});
-
-// Pendulum rod
-rod = line(pivot, bob, {straightFirst: false, straightLast: false, strokeWidth: 2});
+```jsxgraph
+amp = slider([0, 8], [5, 8], [0, 2, 5]);
+f(x) = amp * sin(x);
+graph = plot(f);
 ```
 
-**Do you understand these instructions? If so, please wait for my first physics visualization request.**
+**Wait for my visualization request.**
+
+````
+
+# JessieCode language reference
+
+## Datatypes
+
+- **Boolean**, _true_ or _false_ (case insensitive, _tRuE_ is a valid boolean
+  constant).
+
+- **Strings** are defined using single quote marks. Quote marks inside a string
+  have to be escaped with a backslash.
+
+- **Number**, corresponds to the JavaScript _number_ datatype.
+
+- **Objects**, can be created only via object literal notation **\<\< \>\>** and
+  the predefined element functions (see below). To access properties and
+  methods the operator is used. Example:
+
+```js
+obj = <<
+  property: 'string',
+  prop: 42,
+  method: function (x) {
+      return x*x;
+  }
+>>;
+sixteen = obj.method(4);
+```
+
+- **Functions** are declared with the _function_ operator
+
+```js
+f = function (a, b, c) {
+  return a + b + c;
+};
+```
+
+## Comments
+
+Only one line comments with // being the first non-whitespace characters are
+supported right now.
+
+## Operators
+
+### Logical operators
+
+| Operator | Description |
+| :------- | :---------- |
+| \|\|     | OR          |
+| &&       | AND         |
+| !        | NOT         |
+
+### Arithmetic operators
+
+| Operator | Description                   |
+| :------- | :---------------------------- |
+| \+       | Addition                      |
+| \-       | Subtraction or unary negation |
+| \*       | Multiplication                |
+| /        | Division                      |
+| %        | Modulus                       |
+| ^        | Exponentiation                |
+
+### Assignment operators
+
+| Operator | Description |
+| :------- | :---------- |
+| =        | Assignment  |
+
+### Comparison operators
+
+| Operator | Description                                                   |
+| :------- | :------------------------------------------------------------ |
+| ==       | Equals                                                        |
+| <=       | Lesser or equal                                               |
+| \>=      | Greater or equal                                              |
+| \<       | Lesser                                                        |
+| \>       | Greater                                                       |
+| !=       | Not equal                                                     |
+| \~=      | Approximately equal, can be used to compare two float values. |
+
+### Conditional operator
+
+| Operator             | Description                            |
+| :------------------- | :------------------------------------- |
+| bool ? expr1 : expr2 | expr1 if bool is true, expr2 otherwise |
+
+### String operators
+
+| Operator | Description          |
+| :------- | :------------------- |
+| \+       | String concatenation |
+
+### Member operators
+
+| Operator | Description                                 |
+| :------- | :------------------------------------------ |
+| .        | Access the object\'s properties and methods |
+
+## Control structures
+
+The control structures are exactly the same as in JavaScript.
+
+### If
+
+```js
+if (<expression) {
+  <Stmt>
+} else if (<expression>) {
+  <Stmt>
+} else {
+  <Stmt>
+}
+```
+
+### While loop
+
+```js
+while (<expression>) {
+  <Stmt>
+}
+```
+
+### Do loop
+
+```js
+do {
+  <Stmt>
+} while (<expression>);
+```
+
+### For loop
+
+```js
+for (<assignment>; <expression>; <assignment>) {
+  <Stmt>
+}
+```
+
+## Predefined constants
+
+| Name    | Description                                            |
+| :------ | :----------------------------------------------------- |
+| \$board | Reference to the currently accessed board.             |
+| LN2     | Natural logarithm of 2                                 |
+| LN10    | Natural logarithm of 10                                |
+| LOG2E   | Base 2 logarithm of EULER                              |
+| LOG10E  | Base 10 logarithm of EULER                             |
+| PI      | Ratio of the circumference of a circle to its diameter |
+| EULER   | Euler\'s number e = 2.718281828459045                  |
+| SQRT1_2 | Square root of 1/2                                     |
+| SQRT2   | Square root of 2                                       |
+
+## Predefined functions
+
+### Math functions
+
+Supported are all functions from the JavaScript `Math` object, like `sin`, `cos`, `abs, `random`, ...
+Additionally supported are numerical JSXGraph functions from `JXG.Math`, see <https://jsxgraph.org/docs/symbols/JXG.Math.html>.
+
+| Function           | Description                                                      |
+| :----------------- | :--------------------------------------------------------------- |
+| cos(x)             | Cosine of x                                                      |
+| cosh(x)            | Hyperbolic cosine of x                                           |
+| pow(b, e)          | e to the b                                                       |
+| log(x), ln(x)      | Natural logarithm                                                |
+| log(x, b)          | Logarithm to base b                                              |
+| log2(x), lb(x)     | Logarithm to base 2                                              |
+| log10(x), ld(x)    | Logarithm to base 10                                             |
+| tan(x)             | Tangent of x                                                     |
+| cot(x)             | Cotangent of x                                                   |
+| sqrt(x)            | Square root of x                                                 |
+| cbrt(x)            | Cube root of x                                                   |
+| nthroot(x)         | n-th root of x                                                   |
+| ceil(x)            | Get smallest integer n with n \> x.                              |
+| asin(x)            | arcsine                                                          |
+| abs(x)             | Absolute value of x                                              |
+| max(a, b, c, \...) | Maximum value of all given values.                               |
+| min(a, b, c, \...) | Minimum value of all given values.                               |
+| exp(x)             | EULER to the x                                                   |
+| atan2(y, x)        | Returns the arctangent of the quotient of its arguments.         |
+| random(max = 1)    | Generate a random number between 0 and max.                      |
+| round(v)           | Returns the value of a number rounded to the nearest integer.    |
+| floor(x)           | Returns the biggest integer n with n \< x.                       |
+| acos(x)            | arccosine of x                                                   |
+| atan(x)            | arctangent of x                                                  |
+| acot(x)            | arccotangent of x                                                |
+| sin(x)             | sine of x                                                        |
+| sinh(x)            | Hyperbolic sine of x                                             |
+| factorial(n)       | Calculates n!                                                    |
+| trunc(v, p = 0)    | Truncate v after the p-th decimal.                               |
+| V(s)               | Returns the value of the given element, e.g. sliders and angles. |
+| L(s)               | Calculates the length of the given segment.                      |
+| X(P) Y(P)          | Returns the x resp. y coordinate of the given point.             |
+| dist(P, Q)         | Compute the distance of two points.                              |
+| deg(A, B, C)       | Calculate the angle of three points in degree.                   |
+| rad(A, B, C)       | Calculate the angle of three points in rad.                      |
+| \$(id)             | Look up the element to the given element id.                     |
+
+### \$board methods
+
+| Method                                       | Description                                                                                                                                                                                                                                         |
+| :------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| update()                                     | Update all dependencies and redraw the board.                                                                                                                                                                                                       |
+| on(event, handler, context=board)            | Register an event handler for the given event.                                                                                                                                                                                                      |
+| off(event, handler=)                         | Deregister a given event handler or deregister all event handlers.                                                                                                                                                                                  |
+| setView(array, keepaspectratio=false)        | Changes the viewport. An array with 4 numbers is expected, the four numbers represent the left, upper, right and lower bound of the viewport. If keepaspectratio is true, the viewport is adjusted to the same aspect ratio as the board container. |
+| setBoundingbox(array, keepaspectratio=false) | See setView.                                                                                                                                                                                                                                        |
+| migratePoint(P, Q)                           | Exchange point P by point Q.                                                                                                                                                                                                                        |
+| colorblind(type)                             | Emulate color blindness. Possible types are*protanopia, tritanopia,* and*deuteranopia.*                                                                                                                                                             |
+
+### Element functions
+
+Every element known to the loaded JSXGraph version is available inside Jessie
+by its element type, e.g. points can be created by calling point()
+
+```js
+A = point(1, 2);
+```
+
+The given parameters correspond to the parents array of the JXG.Board.create()
+method. Attributes are given after the function call itself in an object:
+
+```js
+A = point(1, 2) << strokeColor: 'red', face: '[]', size: 7, fillColor: 'black' >>;
+```
+
+For a possibly incomplete list including documentation, see [the JSXGraph
+docs](//jsxgraph.org/docs/); For a complete list see the
+**Element reference** section below.
+
+## Accessing elements
+
+### Variable assignment
+
+```js
+A = point(1, 2);
+A.strokeColor = "#123456";
+```
+
+### \$
+
+```js
+point(1, 2) << id: 'foo', name: 'bar' >>;
+$('foo').strokeColor = '#654321';
+```
+
+### Id
+
+```js
+point(1, 2) << id: 'foo', name: 'bar' >>;
+foo.strokeColor = '#f00f00';
+```
+
+This is possible only if **foo** is not used as a variable. This won\'t work:
+
+```js
+foo = 1;
+(function () {
+  point(1, 2) << id: 'foo' >>;
+  return foo.X();
+})();
+```
+
+### Name
+
+```js
+point(1, 2) << id: 'foo', name: 'bar' >>;
+bar.strokeColor = '#541541';
+```
+
+This is possible only if there is not a variable called **bar** in the current
+or any higher scope. See **Id** above for an example.
+
+## Element reference
+
+See <https://jsxgraph.org/docs/>
+
+### Attributes
+
+Attributes are set like object properties
+
+```js
+A.size = 10;
+A.face = "[]";
+```
+
+See [the JSXGraph docs](//jsxgraph.uni-bayreuth.de/docs/) for available
+attributes. Texts and Points have two special attributes **X** and **Y** to set
+their coordinates.
+
+### Subelements
+
+Subelements like labels for points or the baseline in sliders or the dot
+indicating an angle element is a right angle can be accessed like properties
+
+```js
+A.label.strokecolor = "red";
+```
+
+The names used to access subelements correspond to their names used to set
+their attributes in`board.create`.
+
+### Methods
+
+Not all methods of an element class are accessible in JessieCode. Currently these
+methods are available:
+
+- all elements
+  - setLabelText
+- point
+  - move
+  - glide
+  - free
+  - X
+  - Y
+- glider
+  - all from point
+  - setPosition
+- text
+  - setText
+  - free
+  - move
+- slider
+  - Value
+- angle
+  - Value
+````
+

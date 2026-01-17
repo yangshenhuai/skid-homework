@@ -68,7 +68,7 @@ export default function JSXGraphDiagram({ jesseScript }: JSXGraphDiagramProps) {
   }, [jesseScript, boardId]);
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-[640px]">
+    <div className="flex flex-col gap-4 w-full">
       {error ? (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -78,13 +78,11 @@ export default function JSXGraphDiagram({ jesseScript }: JSXGraphDiagramProps) {
           </AlertDescription>
         </Alert>
       ) : (
-        <>
-          <div
-            id={boardId}
-            ref={boardRef}
-            className="w-full aspect-3/2 rounded-lg bg-white overflow-hidden"
-          />
-        </>
+        <div
+          id={boardId}
+          ref={boardRef}
+          className="w-full aspect-3/2 rounded-lg bg-white overflow-hidden"
+        />
       )}
     </div>
   );

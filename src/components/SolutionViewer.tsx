@@ -226,10 +226,10 @@ export default function SolutionViewer({
 
           <div className="mt-4 space-y-4">
             <div>
-              <div className="mb-1 text-sm font-medium text-slate-300">
+              <div className="mb-1 text-sm font-medium text-black dark:text-slate-300">
                 {t("answer")}
               </div>
-              <div className="rounded-lg bg-slate-900/60 p-3">
+              <div className="rounded-lg bg-slate-300/60 dark:bg-slate-900/60 p-3">
                 <MemoizedMarkdown source={activeProblem?.answer ?? ""} />
               </div>
               <div className="mt-2">

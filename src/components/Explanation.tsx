@@ -24,11 +24,11 @@ export default function Explanation({
   if (mode === "explanation") {
     return (
       <div>
-        <div className="mb-1 text-sm font-medium text-slate-300">
+        <div className="mb-1 text-sm font-medium text-black dark:text-slate-300">
           {t("explanation")}
         </div>
 
-        <div className="rounded-lg bg-slate-900/60 p-3">
+        <div className="rounded-lg bg-slate-300/60 dark:bg-slate-900/60 p-3">
           <MemoizedMarkdown source={content ?? "<Empty Explanation>"} />
         </div>
       </div>

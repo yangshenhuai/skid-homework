@@ -39,6 +39,8 @@ export interface ProblemsState {
   // --- STATE ---
   imageItems: FileItem[];
   imageSolutions: Map<string, Solution>;
+  // The url of the active image
+  // TODO: refactor selectedImage, use id instead of blob url
   selectedImage?: string;
   selectedProblem: number;
   isWorking: boolean;

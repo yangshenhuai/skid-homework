@@ -1,4 +1,4 @@
-import { FileItem, FileStatus } from "@/store/problems-store";
+import { FileItem, FileStatus, useProblemsStore } from "@/store/problems-store";
 import { useTranslation } from "react-i18next";
 import {
   ContextMenu,
@@ -42,17 +42,26 @@ export default function PreviewItem({
   const { t } = useTranslation("commons", { keyPrefix: "preview" });
   const { t: tCommon } = useTranslation("commons");
 
+  const { setSelectedImage, selectedImage } = useProblemsStore((s) => s);
+
   const isMobile = layout === "mobile";
+
+  const switchActiveItem = () => {
+    setSelectedImage(item.url);
+  };
 
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>
+        {/* The main component */}
         <figure
+          onDoubleClick={switchActiveItem}
           className={twMerge(
-            "group relative flex flex-col overflow-hidden border bg-background/80 shadow-sm transition",
+            "group relative flex flex-col overflow-hidden border bg-background/80 shadow-sm transition select-none",
             isMobile
               ? "h-64 min-w-[72vw] rounded-2xl border-white/15"
               : "rounded-xl border-white/10",
+            selectedImage === item.id ? "bg-accent" : "",
             getColorClassByStatus(item.status),
           )}
         >
@@ -84,6 +93,7 @@ export default function PreviewItem({
           </button>
         </figure>
       </ContextMenuTrigger>
+
       <ContextMenuContent>
         {isMobile ? (
           <Label className="px-2 py-1.5">{item.displayName}</Label>

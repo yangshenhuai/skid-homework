@@ -51,6 +51,7 @@ export interface ProblemsState {
 
   // File Management
   addFileItems: (items: FileItem[]) => Promise<void>;
+  renameFileItem: (id: string, newName: string) => Promise<void>;
   updateFileItem: (id: string, updates: Partial<FileItem>) => void;
   updateItemStatus: (id: string, status: FileItem["status"]) => void;
   removeImageItem: (id: string) => Promise<void>;
@@ -161,6 +162,36 @@ export const useProblemsStore = create<ProblemsState>((set, get) => ({
       await db.homeworks.bulkAdd(records);
     } catch (err) {
       console.error("Failed to persist items:", err);
+    }
+  },
+
+  renameFileItem: async (id, newName) => {
+    set((state) => ({
+      imageItems: state.imageItems.map((item) =>
+        item.id === id ? { ...item, displayName: newName } : item,
+      ),
+    }));
+
+    const updatedItem = get().imageItems.find((i) => i.id === id);
+    if (updatedItem && updatedItem.displayName !== newName) {
+      // Reconstruct File object with new name and create a new Object URL
+      const newFile = new File([updatedItem.file], newName, {
+        type: updatedItem.mimeType,
+        lastModified: Date.now(),
+      });
+      const newUrl = URL.createObjectURL(newFile);
+
+      // Update the URL in the state
+      set((state) => ({
+        imageItems: state.imageItems.map((item) =>
+          item.id === id ? { ...item, file: newFile, url: newUrl } : item,
+        ),
+      }));
+
+      // Update the file in the database
+      await db.homeworks
+        .update(id, { fileName: newName, blob: newFile })
+        .catch(console.error);
     }
   },
 

@@ -3,7 +3,7 @@ import type { Solution, FileStatus } from "@/store/problems-store";
 
 export interface HomeworkRecord {
   id: string;
-  blob: Blob; // The image file content
+  blob: Blob;
   fileName: string;
   mimeType: string;
   source: "upload" | "camera";

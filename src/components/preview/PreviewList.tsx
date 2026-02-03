@@ -1,24 +1,20 @@
 import { cn } from "@/lib/utils";
-import { FileStatus, useProblemsStore } from "@/store/problems-store";
-import { X } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { PhotoProvider, PhotoView } from "react-photo-view";
-import { twMerge } from "tailwind-merge";
-import { Badge } from "../ui/badge";
+import { useProblemsStore } from "@/store/problems-store";
+import { PhotoProvider } from "react-photo-view";
 import { ScrollArea } from "../ui/scroll-area";
-
-function getColorClassByStatus(status: FileStatus) {
-  switch (status) {
-    case "success":
-      return "border-green-500";
-    case "failed":
-      return "border-red-500";
-    case "pending":
-      return "border-amber-500";
-    case "processing":
-      return "border-cyan-500";
-  }
-}
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import PreviewItem from "./PreviewItem";
 
 export type PreviewListProps = {
   layout: "default" | "mobile";
@@ -33,114 +29,106 @@ export default function PreviewList({
   removeItem,
   isDragging,
 }: PreviewListProps) {
-  const { t } = useTranslation("commons", { keyPrefix: "preview" });
-  const { t: tCommon } = useTranslation("commons");
   const isMobileLayout = layout === "mobile";
 
-  const { imageItems } = useProblemsStore((s) => s);
+  const { imageItems, renameFileItem } = useProblemsStore((s) => s);
+
+  const [renamingItem, setRenamingItem] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [tempName, setTempName] = useState("");
+
+  const handleStartRename = (id: string, currentName: string) => {
+    setRenamingItem({ id, name: currentName });
+    setTempName(currentName);
+  };
+
+  const handleConfirmRename = async () => {
+    if (renamingItem && tempName.trim()) {
+      await renameFileItem(renamingItem.id, tempName.trim());
+      setRenamingItem(null);
+    }
+  };
+
+  const renderItems = () =>
+    imageItems.map((it) => (
+      <PreviewItem
+        key={it.id}
+        item={it}
+        layout={layout}
+        onRemove={removeItem}
+        onRename={handleStartRename}
+      />
+    ));
 
   return (
-    <PhotoProvider>
-      {isMobileLayout ? (
-        <div className="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
-          {imageItems.map((it) => (
-            <figure
-              key={it.id}
-              className={twMerge(
-                "group relative flex h-64 min-w-[72vw] flex-col overflow-hidden rounded-2xl border border-white/15 bg-background/80 shadow-sm",
-                getColorClassByStatus(it.status),
+    <>
+      <PhotoProvider>
+        {isMobileLayout ? (
+          <div
+            className="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2"
+            onDrop={onDrop}
+          >
+            {renderItems()}
+          </div>
+        ) : (
+          <ScrollArea className="rounded-lg">
+            <div
+              className={cn(
+                "grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4",
+                isDragging
+                  ? "border-indigo-400 bg-indigo-500/10"
+                  : "border-white/15",
               )}
               onDrop={onDrop}
             >
-              {it.mimeType.startsWith("image/") ? (
-                <PhotoView src={it.url}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={it.url}
-                    alt={t("image-alt")}
-                    className="h-48 w-full cursor-pointer object-cover"
-                  />
-                </PhotoView>
-              ) : (
-                <div className="flex h-48 w-full select-none items-center justify-center text-sm">
-                  {it.mimeType === "application/pdf"
-                    ? t("file-type.pdf")
-                    : t("file-type.unknown")}
-                </div>
-              )}
-              <figcaption className="flex items-center justify-between px-4 py-3 text-xs text-slate-200">
-                <span className="truncate pr-2" title={it.displayName}>
-                  {it.displayName}
-                </span>
-                <Badge variant="outline" className="border-white/20">
-                  {tCommon(`sources.${it.source}`)}
-                </Badge>
-              </figcaption>
-              <button
-                className="absolute right-3 top-3 rounded-full bg-black/40 p-2 text-white/90 backdrop-blur transition hover:bg-black/60"
-                onClick={() => removeItem(it.id)}
-                aria-label={t("remove-aria")}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </figure>
-          ))}
-        </div>
-      ) : (
-        <ScrollArea className="rounded-lg">
-          <div
-            className={cn(
-              "grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4",
-              isDragging
-                ? "border-indigo-400 bg-indigo-500/10"
-                : "border-white/15",
-            )}
-            onDrop={onDrop}
-          >
-            {imageItems.map((it) => (
-              <figure
-                key={it.id}
-                className={twMerge(
-                  "group relative overflow-hidden rounded-xl border border-white/10",
-                  getColorClassByStatus(it.status),
-                )}
-              >
-                {it.mimeType.startsWith("image/") ? (
-                  <PhotoView src={it.url}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={it.url}
-                      alt={t("image-alt")}
-                      className="h-40 w-full cursor-pointer object-cover"
-                    />
-                  </PhotoView>
-                ) : (
-                  <div className="flex h-40 w-full select-none items-center justify-center">
-                    {it.mimeType === "application/pdf"
-                      ? t("file-type.pdf")
-                      : t("file-type.unknown")}
-                  </div>
-                )}
-                <figcaption className="flex items-center justify-between px-3 py-2 text-xs text-slate-300">
-                  <span className="truncate" title={it.displayName}>
-                    {it.displayName}
-                  </span>
-                  <Badge variant="outline" className="border-white/20">
-                    {tCommon(`sources.${it.source}`)}
-                  </Badge>
-                </figcaption>
-                <button
-                  className="absolute right-2 top-2 hidden rounded-md bg-black/40 p-1 text-white/90 backdrop-blur transition group-hover:block"
-                  onClick={() => removeItem(it.id)}
-                  aria-label={t("remove-aria")}
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </figure>
-            ))}
+              {renderItems()}
+            </div>
+          </ScrollArea>
+        )}
+      </PhotoProvider>
+
+      <Dialog
+        open={!!renamingItem}
+        onOpenChange={(open) => {
+          if (!open) setRenamingItem(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Rename File</DialogTitle>
+            <DialogDescription>
+              Enter a new name for the file.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                className="col-span-3"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleConfirmRename();
+                }}
+              />
+            </div>
           </div>
-        </ScrollArea>
-      )}
-    </PhotoProvider>
+          <DialogFooter>
+            <Button
+              type="submit"
+              onClick={handleConfirmRename}
+              disabled={!tempName.trim()}
+            >
+              Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

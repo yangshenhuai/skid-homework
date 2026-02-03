@@ -161,7 +161,7 @@ export default function SolutionsArea() {
     });
 
     return lines.join("\n");
-  }, [exportableSolutions, t, translate]);
+  }, [exportableSolutions, translate]);
 
   const handleExportMarkdown = useCallback(() => {
     if (!exportableSolutions.length) {

@@ -240,6 +240,10 @@
       "screenshot-busy": "Capturing...",
       "screenshot-hint": "Capture a screenshot from a connected Android device via ADB (WebUSB)",
       "menu-aria-label": "ADB Menu"
+    },
+    "toasts": {
+      "adb-failed": "Something went wrong with ADB: {{error}}",
+      "webusb-not-supported": "WebUSB is not supported in this browser."
     }
   },
   "uploads-info": {

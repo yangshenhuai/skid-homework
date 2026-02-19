@@ -593,6 +593,10 @@ interface Resources {
       },
       "pdf-disabled": "仅在启用 Gemini 源时支持 PDF 上传。",
       "take-photo": "拍照",
+      "toasts": {
+        "adb-failed": "ADB 处理发生异常： {{error}}",
+        "webusb-not-supported": "该浏览器不支持 WebUSB。"
+      },
       "upload": "上传文件",
       "upload-tip": "支持图片；PDF 需要启用 Gemini 源。"
     },

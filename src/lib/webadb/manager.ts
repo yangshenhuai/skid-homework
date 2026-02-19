@@ -7,6 +7,13 @@ export interface AdbDevice {
     name: string;
 }
 
+export class UnsupportedEnvironmentError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'UnsupportedEnvironmentError';
+    }
+}
+
 export class AdbManager {
     private manager: AdbDaemonWebUsbDeviceManager;
     private credentialStore: AdbWebCredentialStore;
@@ -14,7 +21,7 @@ export class AdbManager {
     constructor() {
         // ensure WebUSB is supported before initializing the manager
         if (typeof navigator === 'undefined' || !('usb' in navigator) || !navigator.usb) {
-            throw new Error('WebUSB is not supported in this environment. Unable to initialize AdbManager.');
+            throw new UnsupportedEnvironmentError('WebUSB is not supported in this environment. Unable to initialize AdbManager.');
         }
 
         const webUsb = navigator.usb;

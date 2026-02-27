@@ -14,6 +14,7 @@ import { TextInputDialog } from "../dialogs/TextInputDialog";
 import improvePrompt from "../../ai/prompts/improve.prompt.md";
 import { getEnabledToolCallingPrompts } from "@/ai/prompts/prompt-manager";
 import { OrderedSolution } from "@/hooks/use-solution-export";
+import { useSettingsStore } from "@/store/settings-store";
 
 export type ImproveSolutionDialogProps = {
   entry: OrderedSolution;
@@ -56,6 +57,7 @@ export const ImproveSolutionDialog = forwardRef<
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isImproving, setImproving] = useState(false);
+  const onlineSearchEnabled = useSettingsStore((s) => s.onlineSearchEnabled);
 
   const handleImproveSolution = async (improveSolutionPrompt: string) => {
     if (!activeProblem) return;
@@ -115,6 +117,7 @@ ${source.traits}
             prompt,
             source.model,
             (text) => appendStreamedOutput(entry.item.id, text),
+            { onlineSearch: onlineSearchEnabled },
           );
 
           const res = parseImproveResponse(resText);

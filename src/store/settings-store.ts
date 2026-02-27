@@ -67,6 +67,8 @@ export interface SettingsState {
 
   clearDialogOnSubmit: boolean;
   setClearDialogOnSubmit: (state: boolean) => void;
+  onlineSearchEnabled: boolean;
+  setOnlineSearchEnabled: (state: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -82,6 +84,7 @@ export const useSettingsStore = create<SettingsState>()(
       explanationMode: "explanation",
       devtoolsEnabled: false,
       clearDialogOnSubmit: true,
+      onlineSearchEnabled: false,
 
       setImageEnhancement: (state) => set({ imageEnhancement: state }),
       setShowQwenHint: (state) => set({ showQwenHint: state }),
@@ -116,6 +119,7 @@ export const useSettingsStore = create<SettingsState>()(
       setExplanationMode: (explanationMode) => set({ explanationMode }),
       setDevtoolsState: (state) => set({ devtoolsEnabled: state }),
       setClearDialogOnSubmit: (state) => set({ clearDialogOnSubmit: state }),
+      setOnlineSearchEnabled: (state) => set({ onlineSearchEnabled: state }),
     }),
     {
       name: "skidhw-storage",
@@ -131,8 +135,9 @@ export const useSettingsStore = create<SettingsState>()(
         explanationMode: state.explanationMode,
         devtools: state.devtoolsEnabled,
         clearDialogOnSubmit: state.clearDialogOnSubmit,
+        onlineSearchEnabled: state.onlineSearchEnabled,
       }),
-      version: 7,
+      version: 8,
       migrate: (persistedState, version) => {
         const data: Partial<SettingsState> & Record<string, unknown> =
           persistedState && typeof persistedState === "object"
@@ -159,6 +164,9 @@ export const useSettingsStore = create<SettingsState>()(
           clearDialogOnSubmit:
             (data as { clearDialogOnSubmit?: boolean }).clearDialogOnSubmit ??
             true,
+          onlineSearchEnabled:
+            (data as { onlineSearchEnabled?: boolean }).onlineSearchEnabled ??
+            false,
         };
       },
     },

@@ -31,8 +31,9 @@ export interface ExplanationStep {
 export interface ProblemSolution {
   problem: string;
   answer: string;
-  explanation: string;
-  steps: ExplanationStep[];
+  explanation: string; // The full raw markdown
+  steps: ExplanationStep[]; // Parsed steps
+  onlineSearch?: string; // Raw ONLINE_SEARCH section content
 }
 
 export interface ProblemsState {

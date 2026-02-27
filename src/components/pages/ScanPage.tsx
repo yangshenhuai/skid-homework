@@ -53,7 +53,9 @@ export default function ScanPage() {
   } = useProblemsStore((s) => s);
   const isStoreReady = useStoreInitialization();
 
-  const { imageEnhancement, traits } = useSettingsStore((s) => s);
+  const { imageEnhancement, traits, onlineSearchEnabled } = useSettingsStore(
+    (s) => s,
+  );
 
   // Zustand store for AI provider configuration.
   const sources = useAiStore((state) => state.sources);
@@ -359,6 +361,7 @@ ${traits}
                 undefined,
                 source.model,
                 (text) => appendStreamedOutput(item.id, text),
+                { onlineSearch: onlineSearchEnabled },
               ),
             );
 

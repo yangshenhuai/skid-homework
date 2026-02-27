@@ -484,6 +484,11 @@ interface Resources {
       "thinking": {
         "budget": "可用思考预算",
         "desc": "针对支持的提供商调整高级思考设置。",
+        "online-search": {
+          "desc": "在需要时允许助手调用联网搜索工具。",
+          "title": "联网搜索",
+          "toggle": "启用联网搜索"
+        },
         "title": "思考参数",
         "tokens-unit": "Tokens"
       },
@@ -539,6 +544,10 @@ interface Resources {
         "next-problem": "下一题",
         "prev-image": "⟵ 文件",
         "prev-problem": "上一题"
+      },
+      "online-search": {
+        "placeholder": "没有可用的搜索索引。",
+        "title": "联网搜索结果"
       },
       "open-preview": "打开预览",
       "progress": {

@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type ReactNode } from "react";
+import { type ReactNode, useId, useRef, useState } from "react";
 import { CircleHelp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +55,9 @@ export function InfoTooltip({
       <button
         type="button"
         className="inline-flex items-center justify-center rounded-full text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-        aria-label={ariaLabel ?? (typeof content === "string" ? content : undefined)}
+        aria-label={
+          ariaLabel ?? (typeof content === "string" ? content : undefined)
+        }
         aria-expanded={open}
         aria-describedby={tooltipId}
         onFocus={openTooltip}
@@ -68,7 +70,9 @@ export function InfoTooltip({
         role="tooltip"
         className={cn(
           "absolute left-1/2 top-full z-20 w-64 -translate-x-1/2 translate-y-2 rounded-md border border-border bg-popover px-3 py-2 text-left text-xs text-popover-foreground opacity-0 shadow-lg transition-opacity duration-150",
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
+          open
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
         )}
         onMouseEnter={openTooltip}
         onMouseLeave={scheduleClose}

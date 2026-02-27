@@ -63,5 +63,7 @@ export abstract class BaseAiClient {
     callback?: (text: string) => void,
   ): Promise<string>;
 
-  abstract getAvailableModels(): Promise<Array<{ name: string; displayName: string }>>;
+  abstract getAvailableModels(): Promise<
+    Array<{ name: string; displayName: string }>
+  >;
 }

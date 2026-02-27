@@ -1,7 +1,10 @@
-import {useEffect, useState} from "react";
-import {Button} from "../ui/button";
-import {buildShortcutFromKeyboardEvent, formatShortcutLabel,} from "@/utils/shortcuts";
-import {useTranslation} from "react-i18next";
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import {
+  buildShortcutFromKeyboardEvent,
+  formatShortcutLabel,
+} from "@/utils/shortcuts";
+import { useTranslation } from "react-i18next";
 
 export interface ShortcutRecorderProps {
   value: string;

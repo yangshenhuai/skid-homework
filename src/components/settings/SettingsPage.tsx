@@ -1,7 +1,7 @@
 "use client";
 
-import {useQwenHintAutoToggle} from "@/hooks/useQwenHintAutoToggle";
-import {cn} from "@/lib/utils";
+import { useQwenHintAutoToggle } from "@/hooks/useQwenHintAutoToggle";
+import { cn } from "@/lib/utils";
 import {
   type AiModelSummary,
   type AiProvider,
@@ -15,26 +15,39 @@ import {
   type ThemePreference,
   useSettingsStore,
 } from "@/store/settings-store";
-import {Check, ChevronsUpDown} from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import Link from "next/link";
-import {useRouter, useSearchParams} from "next/navigation";
-import {useCallback, useEffect, useMemo, useState} from "react";
-import {useHotkeys} from "react-hotkeys-hook";
-import {useTranslation} from "react-i18next";
-import {toast} from "sonner";
-import {useMediaQuery} from "@/hooks/use-media-query";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import ShortcutRecorder from "./ShortcutRecorder";
-import {useTheme} from "../theme-provider";
-import {Button} from "../ui/button";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "../ui/card";
-import {Checkbox} from "../ui/checkbox";
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,} from "../ui/command";
-import {Input} from "../ui/input";
-import {Kbd} from "../ui/kbd";
-import {Label} from "../ui/label";
-import {Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-import {Slider} from "../ui/slider";
-import {Textarea} from "../ui/textarea";
+import { useTheme } from "../theme-provider";
+import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Checkbox } from "../ui/checkbox";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../ui/command";
+import { Input } from "../ui/input";
+import { Kbd } from "../ui/kbd";
+import { Label } from "../ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Slider } from "../ui/slider";
+import { Textarea } from "../ui/textarea";
 import AIAPICredentialsManager from "./AIAPICredentialsManager";
 import AISourceManager from "./AISourceManager";
 import ExplanationModeSelector from "./ExplanationModeSelector";
@@ -99,7 +112,9 @@ export default function SettingsPage() {
 
   const { theme: activeTheme, setTheme } = useTheme();
 
-  const [recordingAction, setRecordingAction] = useState<ShortcutAction | null>(null);
+  const [recordingAction, setRecordingAction] = useState<ShortcutAction | null>(
+    null,
+  );
 
   const activeSource = useMemo(
     () => sources.find((source) => source.id === activeSourceId) ?? sources[0],
@@ -230,7 +245,9 @@ export default function SettingsPage() {
       {
         action: "textInput" as ShortcutAction,
         label: translateSettings("shortcuts.actions.text-input.label"),
-        description: translateSettings("shortcuts.actions.text-input.description"),
+        description: translateSettings(
+          "shortcuts.actions.text-input.description",
+        ),
       },
       !isCompact && {
         action: "adbScreenshot" as ShortcutAction,
@@ -609,7 +626,9 @@ export default function SettingsPage() {
               <Checkbox
                 id="clear-dialog-on-submit"
                 checked={clearDialogOnSubmit}
-                onCheckedChange={(state) => setClearDialogOnSubmit(Boolean(state))}
+                onCheckedChange={(state) =>
+                  setClearDialogOnSubmit(Boolean(state))
+                }
               />
               <Label htmlFor="clear-dialog-on-submit">
                 {t("advanced.ui.clear-dialog-on-submit")}

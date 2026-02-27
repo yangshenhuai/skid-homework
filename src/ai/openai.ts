@@ -74,7 +74,9 @@ export class OpenAiClient extends BaseAiClient {
         },
       });
     } else if (mimeType === "application/pdf") {
-      console.error("PDF media type is not directly supported for completion API.");
+      console.error(
+        "PDF media type is not directly supported for completion API.",
+      );
     } else {
       try {
         let charset = "utf-8";
@@ -95,7 +97,10 @@ export class OpenAiClient extends BaseAiClient {
           text: `\n\n[File Content]\n${text}\n\n`,
         });
       } catch (e) {
-        throw new Error("Failed to decode base64 text: " + (e instanceof Error ? e.message : String(e)));
+        throw new Error(
+          "Failed to decode base64 text: " +
+            (e instanceof Error ? e.message : String(e)),
+        );
       }
     }
 

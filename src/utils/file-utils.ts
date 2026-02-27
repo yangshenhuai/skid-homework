@@ -2,9 +2,9 @@ export function generateTextFilename(content: string): string {
   const now = new Date();
   const timeString = now.toTimeString().split(" ")[0].replace(/:/g, ""); // HHmmss
   let preview = content
-      .trim()
-      .slice(0, 10)
-      .replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, "_");
+    .trim()
+    .slice(0, 10)
+    .replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, "_");
   if (!preview) {
     preview = "content";
   }
@@ -28,7 +28,11 @@ export function isTextMimeType(mimeType: string, fileName?: string): boolean {
   }
   if (fileName) {
     const lowerName = fileName.toLowerCase();
-    return lowerName.endsWith(".md") || lowerName.endsWith(".json") || lowerName.endsWith(".txt");
+    return (
+      lowerName.endsWith(".md") ||
+      lowerName.endsWith(".json") ||
+      lowerName.endsWith(".txt")
+    );
   }
   return false;
 }

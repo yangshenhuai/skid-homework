@@ -1,8 +1,18 @@
 import type { FileItem } from "@/store/problems-store.ts";
 import { useEffect, useState } from "react";
 import { readTextFile } from "@/utils/file-utils.ts";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible.tsx";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.tsx";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Maximize2 } from "lucide-react";
 import type { TFunction } from "i18next";
@@ -31,7 +41,6 @@ export const TextSolutionPreview = ({
       .catch((error) => {
         console.error("Failed to read text file for preview:", item.url, error);
         if (!ignore) {
-          // Optionally clear content or keep previous content; here we clear.
           setContent("");
         }
       });

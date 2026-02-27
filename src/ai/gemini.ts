@@ -68,7 +68,11 @@ export class GeminiAi extends BaseAiClient {
       });
     }
 
-    const parts: Array<{ text: string } | { fileData: { mimeType: string; fileUri: string } } | { inlineData: { mimeType: string; data: string } }> = [];
+    const parts: Array<
+      | { text: string }
+      | { fileData: { mimeType: string; fileUri: string } }
+      | { inlineData: { mimeType: string; data: string } }
+    > = [];
     if (prompt) {
       parts.push({ text: prompt });
     }

@@ -1,4 +1,4 @@
-import {ChevronsUp} from "lucide-react";
+import { ChevronsUp } from "lucide-react";
 import {
   BundledLanguage,
   CodeBlock,
@@ -10,8 +10,8 @@ import {
   CodeBlockHeader,
   CodeBlockItem,
 } from "../ui/shadcn-io/code-block";
-import {useState} from "react";
-import {cn} from "@/lib/utils";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export type CodeRendererProps = {
   language: string;
@@ -20,7 +20,12 @@ export type CodeRendererProps = {
   className?: string;
 };
 
-export default function CodeRenderer({ language, content, filename = "Scratch", className }: CodeRendererProps) {
+export default function CodeRenderer({
+  language,
+  content,
+  filename = "Scratch",
+  className,
+}: CodeRendererProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (

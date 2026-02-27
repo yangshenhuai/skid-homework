@@ -1,13 +1,19 @@
 import "react-photo-view/dist/react-photo-view.css";
-import {Trash2} from "lucide-react";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "../ui/card";
-import type {FileItem} from "@/store/problems-store";
-import {type ClipboardEvent, useCallback, useRef, useState} from "react";
-import {cn} from "@/lib/utils";
-import {useTranslation} from "react-i18next";
+import { Trash2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import type { FileItem } from "@/store/problems-store";
+import { type ClipboardEvent, useCallback, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 import EmptyPreviewList from "./EmptyPreviewList";
 import PreviewList from "./PreviewList";
-import {generateTextFilename} from "@/utils/file-utils";
+import { generateTextFilename } from "@/utils/file-utils";
 
 export type PreviewCardProps = {
   items: FileItem[];
@@ -122,7 +128,10 @@ export default function PreviewCard({
           </CardDescription>
         </CardHeader>
         <CardContent
-          className={cn("flex flex-col gap-2 flex-1", isMobileLayout && "min-h-[20rem]")}
+          className={cn(
+            "flex flex-col gap-2 flex-1",
+            isMobileLayout && "min-h-[20rem]",
+          )}
           onDragEnter={onDragEnter}
           onDragOver={(e) => {
             if (isMobileLayout) return;
@@ -133,10 +142,7 @@ export default function PreviewCard({
           onDrop={onDrop}
         >
           {items.length === 0 ? (
-            <EmptyPreviewList
-              layout={layout}
-              isDragging={isDragging}
-            />
+            <EmptyPreviewList layout={layout} isDragging={isDragging} />
           ) : (
             <PreviewList
               isDragging={isDragging}

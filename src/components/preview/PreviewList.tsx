@@ -66,9 +66,7 @@ export default function PreviewList({
     <>
       <PhotoProvider>
         {isMobileLayout ? (
-          <div
-            className="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2"
-          >
+          <div className="-mx-1 flex snap-x gap-4 overflow-x-auto px-1 pb-2">
             {renderItems()}
           </div>
         ) : (

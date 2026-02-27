@@ -1,4 +1,6 @@
-const MODIFIER_ORDER: Array<["ctrlKey" | "shiftKey" | "altKey" | "metaKey", string]> = [
+const MODIFIER_ORDER: Array<
+  ["ctrlKey" | "shiftKey" | "altKey" | "metaKey", string]
+> = [
   ["ctrlKey", "ctrl"],
   ["shiftKey", "shift"],
   ["altKey", "alt"],
@@ -194,13 +196,11 @@ export function formatShortcutLabel(shortcut?: string | null): string | null {
   if (!shortcut) return null;
   const variants = expandShortcutVariants(shortcut);
   const target = variants.length
-    ? variants
-        .slice()
-        .sort((a, b) => {
-          const aLen = a.split("+").filter(Boolean).length;
-          const bLen = b.split("+").filter(Boolean).length;
-          return aLen === bLen ? a.localeCompare(b) : aLen - bLen;
-        })[0]
+    ? variants.slice().sort((a, b) => {
+        const aLen = a.split("+").filter(Boolean).length;
+        const bLen = b.split("+").filter(Boolean).length;
+        return aLen === bLen ? a.localeCompare(b) : aLen - bLen;
+      })[0]
     : shortcut;
 
   const parts = target.split("+").filter(Boolean);
@@ -289,8 +289,8 @@ function normalizeShortcutTokens(tokens: string[]): string | null {
 
   if (nonModifiers.length !== 1) return null;
 
-  const orderedModifiers = MODIFIER_ORDER.map(([, token]) => token).filter((token) =>
-    modifiers.has(token),
+  const orderedModifiers = MODIFIER_ORDER.map(([, token]) => token).filter(
+    (token) => modifiers.has(token),
   );
 
   return [...orderedModifiers, nonModifiers[0]].join("+");

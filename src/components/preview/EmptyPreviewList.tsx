@@ -38,9 +38,7 @@ export default function EmptyPreviewList({
           : t("drag-tip")}
       </p>
       {!isMobileLayout && (
-        <p className="mt-2 text-xs text-slate-500">
-          {t("supported-types")}
-        </p>
+        <p className="mt-2 text-xs text-slate-500">{t("supported-types")}</p>
       )}
     </div>
   );

@@ -8,11 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import i18n from "@/i18n";
 import { useSettingsStore } from "@/store/settings-store";
 
-export default function Providers({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function Providers({ children }: { children: React.ReactNode }) {
   const language = useSettingsStore((state) => state.language);
   const initializeLanguage = useSettingsStore(
     (state) => state.initializeLanguage,

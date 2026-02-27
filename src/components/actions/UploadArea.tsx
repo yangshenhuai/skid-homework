@@ -1,4 +1,4 @@
-import { Camera, MoreVertical, Upload, FileText } from "lucide-react";
+import { Camera, FileText, MoreVertical, Upload } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -202,10 +202,14 @@ export default function UploadArea({ appendFiles, allowPdf }: UploadAreaProps) {
     [handleAdbBtnClicked],
   );
 
-  const textInputShortcut = useShortcut("textInput", () => {
-    if (isWorking || adbBusy) return;
-    setTextInputOpen(true);
-  }, [isWorking, adbBusy]);
+  const textInputShortcut = useShortcut(
+    "textInput",
+    () => {
+      if (isWorking || adbBusy) return;
+      setTextInputOpen(true);
+    },
+    [isWorking, adbBusy],
+  );
 
   const fileAccept = allowPdf
     ? "image/*,application/pdf,text/*,.txt,.md,.json"

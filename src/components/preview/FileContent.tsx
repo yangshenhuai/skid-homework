@@ -1,8 +1,8 @@
-import {FileItem} from "@/store/problems-store";
-import {useTranslation} from "react-i18next";
-import {PhotoView} from "react-photo-view";
-import {isTextMimeType} from "@/utils/file-utils";
-import {TextFilePreview} from "./TextFilePreview";
+import { FileItem } from "@/store/problems-store";
+import { useTranslation } from "react-i18next";
+import { PhotoView } from "react-photo-view";
+import { isTextMimeType } from "@/utils/file-utils";
+import { TextFilePreview } from "./TextFilePreview";
 
 export type FileContentProps = {
   it: FileItem;

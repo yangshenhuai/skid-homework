@@ -1,27 +1,66 @@
 import OpenAI from "openai";
-import type {
-  ChatCompletionMessageParam,
-} from "openai/resources/chat/completions";
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import type { AiChatMessage } from "./chat-types";
 import { BaseAiClient } from "./base-client";
 import { base64Decoder } from "@/utils/encoding";
+import { toast } from "sonner";
+import i18n from "@/i18n";
+import type { AiFile } from "@/store/ai-store";
 
 export type OpenAiModel = {
-    name: string;
-    displayName: string;
+  name: string;
+  displayName: string;
 };
+
+export interface ResponseInputTextContent {
+  type: "input_text";
+  text: string;
+}
+
+export interface ResponseInputImageContent {
+  type: "input_image";
+  image_url: {
+    url: string;
+    detail?: "auto" | "low" | "high";
+  };
+}
+
+export interface ResponseInputFileContent {
+  type: "input_file";
+  filename?: string;
+  file_data: string;
+}
+
+export type ResponseApiContentPart =
+  | ResponseInputTextContent
+  | ResponseInputImageContent
+  | ResponseInputFileContent;
+
+export interface ResponseApiMessage {
+  role: "system" | "user" | "assistant";
+  content: string | ResponseApiContentPart[];
+}
 
 const DEFAULT_OPENAI_ROOT = "https://api.openai.com/v1";
 
 function normalizeBaseUrl(baseUrl?: string) {
-    return (baseUrl ?? DEFAULT_OPENAI_ROOT).replace(/\/$/, "");
+  return (baseUrl ?? DEFAULT_OPENAI_ROOT).replace(/\/$/, "");
 }
 
 export class OpenAiClient extends BaseAiClient {
   private client: OpenAI;
+  private useResponsesApi: boolean;
+  private webSearchToolType?: string;
 
-  constructor(apiKey: string, baseUrl?: string) {
+  constructor(
+    apiKey: string,
+    baseUrl?: string,
+    useResponsesApi = false,
+    webSearchToolType?: string,
+  ) {
     super();
+    this.useResponsesApi = useResponsesApi;
+    this.webSearchToolType = webSearchToolType;
     this.client = new OpenAI({
       apiKey,
       baseURL: normalizeBaseUrl(baseUrl),
@@ -33,13 +72,42 @@ export class OpenAiClient extends BaseAiClient {
    * Sends a request with an image (Vision API).
    */
   async sendMedia(
-    media: string,
-    mimeType: string,
+    file: AiFile,
     prompt?: string,
     model = "gpt-5.2",
     callback?: (text: string) => void,
     options?: { onlineSearch?: boolean },
   ) {
+    if (!this.useResponsesApi) {
+      if (options?.onlineSearch) {
+        toast.error(
+          i18n.t("ai-client.openai.requires-response-api-online-search", {
+            ns: "commons",
+          }),
+        );
+        throw new Error("Online search requires Responses API to be enabled.");
+      }
+      if (file.mimeType === "application/pdf") {
+        toast.error(
+          i18n.t("ai-client.openai.requires-response-api-pdf", {
+            ns: "commons",
+          }),
+        );
+        throw new Error("PDF processing requires Responses API to be enabled.");
+      }
+      return this._sendMediaLegacy(file, prompt, model, callback);
+    }
+
+    return this._sendMediaResponsesApi(file, prompt, model, callback, options);
+  }
+
+  private async _sendMediaLegacy(
+    file: AiFile,
+    prompt?: string,
+    model = "gpt-5.2",
+    callback?: (text: string) => void,
+  ) {
+    const { data: media, mimeType, name } = file;
     const messages: ChatCompletionMessageParam[] = [];
 
     if (this.systemPrompts.length > 0) {
@@ -73,8 +141,6 @@ export class OpenAiClient extends BaseAiClient {
           detail: "auto",
         },
       });
-    } else if (mimeType === "application/pdf") {
-      console.error("PDF media type is not directly supported for completion API.");
     } else {
       try {
         let charset = "utf-8";
@@ -90,10 +156,13 @@ export class OpenAiClient extends BaseAiClient {
         }
         contentParts.push({
           type: "text",
-          text: `\n\n[File Content]\n${text}\n\n`,
+          text: `\n\n[File Content: ${name}]\n${text}\n\n`,
         });
       } catch (e) {
-        throw new Error("Failed to decode base64 text: " + (e instanceof Error ? e.message : String(e)));
+        throw new Error(
+          "Failed to decode base64 text: " +
+            (e instanceof Error ? e.message : String(e)),
+        );
       }
     }
 
@@ -102,10 +171,56 @@ export class OpenAiClient extends BaseAiClient {
       content: contentParts,
     });
 
-    if (options?.onlineSearch) {
-      return this._executeResponsesStream(model, messages, callback, options);
-    }
     return this._executeStream(model, messages, callback);
+  }
+
+  private async _sendMediaResponsesApi(
+    file: AiFile,
+    prompt?: string,
+    model = "gpt-5.2",
+    callback?: (text: string) => void,
+    options?: { onlineSearch?: boolean },
+  ) {
+    const { data: media, mimeType, name } = file;
+    const messages: ResponseApiMessage[] = [];
+
+    if (this.systemPrompts.length > 0) {
+      messages.push({
+        role: "system",
+        content: this.buildSystemPrompt(),
+      });
+    }
+
+    const contentParts: ResponseApiContentPart[] = [];
+
+    if (prompt) {
+      contentParts.push({
+        type: "input_text",
+        text: prompt,
+      });
+    }
+
+    if (mimeType.startsWith("image/")) {
+      contentParts.push({
+        type: "input_image",
+        image_url: {
+          url: `data:${mimeType};base64,${media}`,
+        },
+      });
+    } else {
+      contentParts.push({
+        type: "input_file",
+        filename: name,
+        file_data: media,
+      });
+    }
+
+    messages.push({
+      role: "user",
+      content: contentParts,
+    });
+
+    return this._executeResponsesStream(model, messages, callback, options);
   }
 
   /**
@@ -116,6 +231,26 @@ export class OpenAiClient extends BaseAiClient {
     model = "gpt-5.2",
     callback?: (text: string) => void,
     options?: { onlineSearch?: boolean },
+  ) {
+    if (!this.useResponsesApi && options?.onlineSearch) {
+      toast.error(
+        i18n.t("ai-client.openai.requires-response-api-online-search", {
+          ns: "commons",
+        }),
+      );
+      throw new Error("Online search requires Responses API to be enabled.");
+    }
+
+    if (this.useResponsesApi) {
+      return this._sendChatResponsesApi(messages, model, callback, options);
+    }
+    return this._sendChatLegacy(messages, model, callback);
+  }
+
+  private async _sendChatLegacy(
+    messages: AiChatMessage[],
+    model: string,
+    callback?: (text: string) => void,
   ) {
     const openAiMessages: ChatCompletionMessageParam[] = [];
 
@@ -146,98 +281,190 @@ export class OpenAiClient extends BaseAiClient {
       });
     }
 
-    if (options?.onlineSearch) {
-      return this._executeResponsesStream(model, openAiMessages, callback, options);
-    }
     return this._executeStream(model, openAiMessages, callback);
   }
 
-  private async _executeStream(
-      model: string,
-      messages: ChatCompletionMessageParam[],
-      callback?: (text: string) => void,
-  ): Promise<string> {
-      const stream = await this.client.chat.completions.create({
-          model,
-          messages,
-          stream: true,
+  private async _sendChatResponsesApi(
+    messages: AiChatMessage[],
+    model: string,
+    callback?: (text: string) => void,
+    options?: { onlineSearch?: boolean },
+  ) {
+    const openAiMessages: ResponseApiMessage[] = [];
+
+    if (this.systemPrompts.length > 0) {
+      const systemPrompt = this.buildSystemPrompt();
+      openAiMessages.push({
+        role: "system",
+        content: [{ type: "input_text", text: systemPrompt }],
       });
+    }
 
-      let aggregated = "";
+    this.logAiQuery(model, messages);
 
-      for await (const chunk of stream) {
-          const delta = chunk.choices[0]?.delta?.content || "";
+    for (const message of messages) {
+      const trimmed = message.content?.trim();
+      if (!trimmed) continue;
 
-          if (delta) {
-              aggregated += delta;
-              callback?.(delta);
-          }
+      const role =
+        message.role === "assistant"
+          ? "assistant"
+          : message.role === "system"
+            ? "system"
+            : "user";
+
+      openAiMessages.push({
+        role: role,
+        content: [{ type: "input_text", text: trimmed }],
+      });
+    }
+
+    return this._executeResponsesStream(
+      model,
+      openAiMessages,
+      callback,
+      options,
+    );
+  }
+
+  private async _executeStream(
+    model: string,
+    messages: ChatCompletionMessageParam[],
+    callback?: (text: string) => void,
+  ): Promise<string> {
+    const stream = await this.client.chat.completions.create({
+      model,
+      messages,
+      stream: true,
+    });
+
+    let aggregated = "";
+
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content || "";
+
+      if (delta) {
+        aggregated += delta;
+        callback?.(delta);
       }
+    }
 
-      return aggregated.trim();
+    return aggregated.trim();
+  }
+
+  private getWebSearchToolType(model: string): string {
+    if (this.webSearchToolType) {
+      return this.webSearchToolType;
+    }
+    // if webSearchToolType is not explicitly set, determine based on model name
+    // For older models, the tool type is "web_search_preview". For newer ones it's "web_search".
+    // This is based on observed behavior and may need to be updated as OpenAI releases new models.
+    return model.includes("4.1") || model.includes("4o")
+      ? "web_search_preview"
+      : "web_search";
   }
 
   /**
    * Streaming helper using the Responses API to support web search.
    */
   private async _executeResponsesStream(
-      model: string,
-      messages: ChatCompletionMessageParam[],
-      callback?: (text: string) => void,
-      options?: { onlineSearch?: boolean },
+    model: string,
+    messages: ResponseApiMessage[],
+    callback?: (text: string) => void,
+    options?: { onlineSearch?: boolean },
   ): Promise<string> {
-      // Choose the correct web search tool name for the model family.
-      const toolType = model.includes("4.1") || model.includes("4o") ? "web_search_preview" : "web_search";
+    const toolType = this.getWebSearchToolType(model);
 
-      const toolsUsed = options?.onlineSearch ? [{type: toolType}] : undefined;
-      let stream: AsyncIterable<{ type: string; delta?: string }>;
+    const toolsUsed = options?.onlineSearch ? [{ type: toolType }] : undefined;
+    let stream: AsyncIterable<{ type: string; delta?: string }>;
 
-      try {
-          // Type assertion to bypass missing definitions if any
-          const responsesApi = (this.client as unknown as { responses: { create: (opts: unknown) => Promise<AsyncIterable<{ type: string; delta?: string }>> } }).responses;
-          stream = await responsesApi.create({
-              model,
-              tools: toolsUsed,
-              stream: true,
-              input: messages
-          });
-      } catch (err) {
-          const message = (err as Error)?.message ?? "";
-          // Graceful fallback: if the model rejects web search, retry without it.
-          const notSupported =
-              message.includes("not supported") ||
-              message.includes("web search options not supported") ||
-              message.includes("Web search options not supported");
-          if (options?.onlineSearch && notSupported) {
-              console.warn(
-                  `Web search not supported for model ${model}; falling back without search.`,
-              );
-              return this._executeStream(model, messages, callback);
+    try {
+      const responsesApi = (
+        this.client as unknown as {
+          responses: {
+            create: (
+              opts: unknown,
+            ) => Promise<AsyncIterable<{ type: string; delta?: string }>>;
+          };
+        }
+      ).responses;
+      stream = await responsesApi.create({
+        model,
+        tools: toolsUsed,
+        stream: true,
+        input: messages,
+      });
+    } catch (err) {
+      const message = (err as Error)?.message ?? "";
+      const notSupported =
+        message.includes("not supported") ||
+        message.includes("web search options not supported") ||
+        message.includes("Web search options not supported");
+      if (options?.onlineSearch && notSupported) {
+        console.warn(
+          `Web search not supported for model ${model}; falling back without search.`,
+        );
+        const legacyMessages = messages.map((msg) => {
+          if (typeof msg.content === "string") {
+            return { role: msg.role, content: msg.content };
           }
-          throw err;
-      }
-      let aggregated = "";
-
-      // Iterate over the Server-Sent Events
-      for await (const event of stream) {
-          if (event.type === 'response.output_text.delta') {
-              const delta = event.delta;
-
-              if (delta) {
-                  aggregated += delta;
-                  callback?.(delta);
+          if (!Array.isArray(msg.content)) {
+            return { role: msg.role, content: "" };
+          }
+          const contentParts: Array<
+            | { type: "text"; text: string }
+            | {
+                type: "image_url";
+                image_url: { url: string; detail?: "auto" | "low" | "high" };
               }
+          > = [];
+          for (const part of msg.content) {
+            if (part.type === "input_text") {
+              contentParts.push({ type: "text", text: part.text });
+            } else if (part.type === "input_image") {
+              contentParts.push({
+                type: "image_url",
+                image_url: {
+                  url: part.image_url.url,
+                  detail: part.image_url.detail ?? "auto",
+                },
+              });
+            }
           }
+          if (contentParts.length === 0) {
+            return { role: msg.role, content: "" };
+          }
+          if (contentParts.length === 1 && contentParts[0].type === "text") {
+            return { role: msg.role, content: contentParts[0].text };
+          }
+          return { role: msg.role, content: contentParts };
+        }) as ChatCompletionMessageParam[];
+
+        return this._executeStream(model, legacyMessages, callback);
       }
-      return aggregated.trim();
+      throw err;
+    }
+    let aggregated = "";
+
+    for await (const event of stream) {
+      if (event.type === "response.output_text.delta") {
+        const delta = event.delta;
+
+        if (delta) {
+          aggregated += delta;
+          callback?.(delta);
+        }
+      }
+    }
+    return aggregated.trim();
   }
 
   async getAvailableModels(): Promise<OpenAiModel[]> {
-      const response = await this.client.models.list();
+    const response = await this.client.models.list();
 
-      return response.data.map((model) => ({
-          name: model.id,
-          displayName: model.id,
-      }));
+    return response.data.map((model) => ({
+      name: model.id,
+      displayName: model.id,
+    }));
   }
 }

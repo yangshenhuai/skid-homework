@@ -21,7 +21,16 @@ export interface AiSource {
   model: string;
   traits?: string;
   thinkingBudget?: number;
+  useResponsesApi?: boolean;
+  webSearchToolType?: string;
   enabled: boolean;
+}
+
+export function sourceSupportsFileUpload(source: AiSource): boolean {
+  return (
+    source.provider === "gemini" ||
+    (source.provider === "openai" && !!source.useResponsesApi)
+  );
 }
 
 export type ImportAISourceModel = {
@@ -32,12 +41,17 @@ export type ImportAISourceModel = {
   key?: string;
 };
 
+export interface AiFile {
+  data: string;
+  mimeType: string;
+  name: string;
+}
+
 export interface AiClient {
   setAvailableTools: (prompts: string[]) => void;
   addSystemPrompt: (prompt: string) => void;
   sendMedia: (
-    media: string,
-    mimeType: string,
+    file: AiFile,
     prompt?: string,
     model?: string,
     callback?: (text: string) => void,
@@ -125,7 +139,12 @@ function createClientForSource(source: AiSource): AiClient | null {
   }
 
   if (source.provider === "openai") {
-    return new OpenAiClient(source.apiKey, source.baseUrl);
+    return new OpenAiClient(
+      source.apiKey,
+      source.baseUrl,
+      source.useResponsesApi,
+      source.webSearchToolType,
+    );
   }
 
   return null;
@@ -240,9 +259,7 @@ export const useAiStore = create<AiStore>()(
       },
 
       allowPdfUpload: () => {
-        return get()
-          .getEnabledSources()
-          .some((source) => source.provider === "gemini");
+        return get().getEnabledSources().some(sourceSupportsFileUpload);
       },
 
       getClientForSource: (id) => {

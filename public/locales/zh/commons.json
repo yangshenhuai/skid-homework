@@ -59,7 +59,7 @@
       "status_plural": "已有 {{count}} 个文件",
       "empty": "先添加文件或 PDF 开始使用。",
       "hint-ready": "可以开始识别了，准备好后点击「开始打滑」。",
-      "hint-pdf": "启用 Gemini 源即可支持 PDF 上传。",
+      "hint-pdf": "启用 Gemini 或开启 Responses API 的 OpenAI 源即可支持 PDF 上传。",
       "tabs": {
         "capture": "采集",
         "preview": "预览"
@@ -104,7 +104,7 @@
       },
       "pdf-blocked": {
         "title": "PDF 上传已禁用",
-        "description": "要处理 PDF，请启用 Gemini 源。"
+        "description": "要处理 PDF，请启用 Gemini 源或开启 Responses API 的 OpenAI 源。"
       }
     },
     "errors": {
@@ -220,7 +220,7 @@
   "upload-area": {
     "take-photo": "拍照",
     "upload": "上传文件",
-    "upload-tip": "支持图片和文本；PDF 需要启用 Gemini 源。",
+    "upload-tip": "支持图片和文本；PDF 需要启用 Gemini 源或者启用 OpenAI Responses API。",
     "text-input": {
       "button": "文本",
       "title": "输入题目文本",
@@ -239,7 +239,7 @@
       ],
       "close": "知道了"
     },
-    "pdf-disabled": "仅在启用 Gemini 源时支持 PDF 上传。",
+    "pdf-disabled": "仅在启用 Gemini 源或开启 Responses API 的 OpenAI 源时支持 PDF 上传。",
     "adb": {
       "connect": "ADB 连接",
       "reconnect": "重新连接 ADB",
@@ -282,6 +282,28 @@
       "name": {
         "label": "来源名称",
         "placeholder": "展示在界面中的昵称"
+      },
+      "advanced": {
+        "title": "高级选项",
+        "quick-preset": "快捷调整服务提供商",
+        "quick-preset-placeholder": "选择预设提供商...",
+        "openai-default": "OpenAI (默认)",
+        "openrouter": "OpenRouter",
+        "custom-url": "自定义 URL",
+        "switched-openrouter": "已切换为 OpenRouter",
+        "switched-openai": "已重置为 OpenAI 默认",
+        "enable-response-api": "启用 Responses API",
+        "response-api-tip": "提示: 启用 Responses API 后，OpenAI 模型可读取 PDF 并进行联网搜索。未启用此 API 时，这些功能不可用。",
+        "web-search-tool": {
+          "label": "联网搜索工具类型",
+          "placeholder": "选择工具类型...",
+          "auto": "自动 (根据模型选择)",
+          "web-search": "web_search",
+          "web-search-preview": "web_search_preview",
+          "custom": "自定义",
+          "custom-placeholder": "输入自定义工具名称...",
+          "tip": "选择 Responses API 使用的联网搜索工具类型。自动模式会根据模型名称自动选择。"
+        }
       }
     },
     "sources": {
@@ -652,5 +674,11 @@
     "upload": "本地上传",
     "camera": "拍摄",
     "adb": "ADB"
+  },
+  "ai-client": {
+    "openai": {
+      "requires-response-api-online-search": "使用联网搜索功能需要开启 Responses API 设置",
+      "requires-response-api-pdf": "使用 PDF 识别功能需要开启 Responses API 设置"
+    }
   }
 }

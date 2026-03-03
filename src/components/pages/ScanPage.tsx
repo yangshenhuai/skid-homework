@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { Info, StarIcon } from "lucide-react";
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAiStore } from "@/store/ai-store";
 import ActionsCard from "../actions/ActionsCard";
 import PreviewCard from "../preview/PreviewCard";
@@ -12,11 +12,7 @@ import solvePrompt from "@/ai/prompts/solve.prompt.md";
 import { uint8ToBase64 } from "@/utils/encoding";
 import { parseSolveResponse } from "@/ai/response";
 
-import {
-  useProblemsStore,
-  type FileItem as FileItem,
-  type ProblemSolution,
-} from "@/store/problems-store";
+import { type FileItem as FileItem, type ProblemSolution, useProblemsStore } from "@/store/problems-store";
 import SolutionsArea from "../solutions/SolutionsArea";
 import { useSettingsStore } from "@/store/settings-store";
 import { processImage } from "@/utils/image-post-processing";
@@ -356,8 +352,11 @@ ${traits}
 
             const resText = await retryAsyncOperation(() =>
               aiClient.sendMedia(
-                base64,
-                item.mimeType,
+                {
+                  data: base64,
+                  mimeType: item.mimeType,
+                  name: item.displayName,
+                },
                 undefined,
                 source.model,
                 (text) => appendStreamedOutput(item.id, text),

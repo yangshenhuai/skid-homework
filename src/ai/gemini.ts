@@ -1,6 +1,7 @@
 import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from "@google/genai";
 import type { AiChatMessage } from "./chat-types";
 import { BaseAiClient } from "./base-client";
+import type { AiFile } from "@/store/ai-store";
 
 export interface GeminiModel {
   name: string;
@@ -120,13 +121,13 @@ export class GeminiAi extends BaseAiClient {
   }
 
   async sendMedia(
-    media: string,
-    mimeType: string,
+    file: AiFile,
     prompt?: string,
     model = "gemini-3.1-pro-preview",
     callback?: (text: string) => void,
     options?: { onlineSearch?: boolean },
   ) {
+    const { data: media, mimeType } = file;
     const contents = [];
 
     if (this.systemPrompts.length > 0) {

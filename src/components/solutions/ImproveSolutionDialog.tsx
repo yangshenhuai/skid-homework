@@ -1,8 +1,8 @@
 import { Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Kbd } from "../ui/kbd";
-import { useProblemsStore, type ProblemSolution } from "@/store/problems-store";
-import { parseImproveResponse, type ImproveResponse } from "@/ai/response";
+import { type ProblemSolution, useProblemsStore } from "@/store/problems-store";
+import { type ImproveResponse, parseImproveResponse } from "@/ai/response";
 import { useAiStore } from "@/store/ai-store";
 import { forwardRef, useImperativeHandle, useMemo, useState } from "react";
 import { renderImproveXml } from "@/ai/request";
@@ -112,8 +112,11 @@ ${source.traits}
           clearStreamedOutput(entry.item.id);
 
           const resText = await aiClient.sendMedia(
-            base64,
-            entry.item.mimeType,
+            {
+              data: base64,
+              mimeType: entry.item.mimeType,
+              name: entry.item.displayName,
+            },
             prompt,
             source.model,
             (text) => appendStreamedOutput(entry.item.id, text),

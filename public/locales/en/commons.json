@@ -59,7 +59,7 @@
       "status_plural": "{{count}} files ready",
       "empty": "Add a photo or PDF to get started.",
       "hint-ready": "You're ready to scan. Tap “Let's Skid” when you're set.",
-      "hint-pdf": "Enable a Gemini source in Settings to allow PDF uploads.",
+      "hint-pdf": "Enable a Gemini or OpenAI (Responses API enabled) source in Settings to allow PDF uploads.",
       "tabs": {
         "capture": "Capture",
         "preview": "Review"
@@ -104,7 +104,7 @@
       },
       "pdf-blocked": {
         "title": "PDF uploads disabled",
-        "description": "Enable a Gemini source to process PDF files."
+        "description": "Enable a Gemini or OpenAI (Responses API enabled) source to process PDF files."
       }
     },
     "errors": {
@@ -220,7 +220,7 @@
   "upload-area": {
     "take-photo": "Camera",
     "upload": "Upload Files",
-    "upload-tip": "Images and text files are supported. PDFs require an active Gemini source.",
+    "upload-tip": "Images and text files are supported. PDFs require an active Gemini or OpenAI (Responses API enabled) source.",
     "text-input": {
       "button": "Text",
       "title": "Input Problem Text",
@@ -239,7 +239,7 @@
       ],
       "close": "Got it"
     },
-    "pdf-disabled": "PDF uploads are available only when a Gemini source is enabled.",
+    "pdf-disabled": "PDF uploads are available only when a Gemini or OpenAI (Response API enabled) source is enabled.",
     "adb": {
       "connect": "ADB Connect",
       "reconnect": "Reconnect ADB",
@@ -282,6 +282,28 @@
       "name": {
         "label": "Source name",
         "placeholder": "Friendly name shown in the app"
+      },
+      "advanced": {
+        "title": "Advanced Options",
+        "quick-preset": "Quick Preset Provider",
+        "quick-preset-placeholder": "Select preset provider...",
+        "openai-default": "OpenAI (Default)",
+        "openrouter": "OpenRouter",
+        "custom-url": "Custom URL",
+        "switched-openrouter": "Switched to OpenRouter",
+        "switched-openai": "Reset to OpenAI default",
+        "enable-response-api": "Enable Response API",
+        "response-api-tip": "Hint: Enabling the new API allows OpenAI models to read PDFs and perform web searches. These features are unavailable without this API.",
+        "web-search-tool": {
+          "label": "Web Search Tool Type",
+          "placeholder": "Select tool type...",
+          "auto": "Auto (based on model)",
+          "web-search": "web_search",
+          "web-search-preview": "web_search_preview",
+          "custom": "Custom",
+          "custom-placeholder": "Enter custom tool name...",
+          "tip": "Choose the web search tool type for the Responses API. Auto will select based on the model name."
+        }
       }
     },
     "sources": {
@@ -648,5 +670,11 @@
     "upload": "Upload",
     "camera": "Camera",
     "adb": "ADB"
+  },
+  "ai-client": {
+    "openai": {
+      "requires-response-api-online-search": "Using online search requires Responses API to be enabled",
+      "requires-response-api-pdf": "Using PDF recognition requires Responses API to be enabled"
+    }
   }
 }

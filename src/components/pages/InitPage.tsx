@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Sparkles, ShieldCheck, Camera, Rocket } from "lucide-react";
+import { Camera, Rocket, ShieldCheck, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
@@ -71,13 +71,14 @@ export default function InitPage() {
     if (!trimmedKey) return;
 
     const trimmedBase = (baseUrl ?? "").trim();
+    const defaultBaseUrl =
+      activeSource.provider === "gemini"
+        ? DEFAULT_GEMINI_BASE_URL
+        : DEFAULT_OPENAI_BASE_URL;
+
     updateSource(activeSource.id, {
       apiKey: trimmedKey || null,
-      baseUrl:
-        trimmedBase ||
-        (activeSource.provider === "gemini"
-          ? DEFAULT_GEMINI_BASE_URL
-          : DEFAULT_OPENAI_BASE_URL),
+      baseUrl: trimmedBase || defaultBaseUrl,
       enabled: true,
     });
     const from = searchParams.get("from");

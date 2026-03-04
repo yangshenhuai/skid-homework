@@ -12,11 +12,7 @@ import solvePrompt from "@/ai/prompts/solve.prompt.md";
 import { uint8ToBase64 } from "@/utils/encoding";
 import { parseSolveResponse } from "@/ai/response";
 
-import {
-  type FileItem as FileItem,
-  type ProblemSolution,
-  useProblemsStore,
-} from "@/store/problems-store";
+import { type FileItem as FileItem, type ProblemSolution, useProblemsStore } from "@/store/problems-store";
 import SolutionsArea from "../solutions/SolutionsArea";
 import { useSettingsStore } from "@/store/settings-store";
 import { processImage } from "@/utils/image-post-processing";

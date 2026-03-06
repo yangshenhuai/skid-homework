@@ -293,7 +293,7 @@ export const useProblemsStore = create<ProblemsState>()(
             answer: newAnswer,
             explanation: newExplanation,
             steps: newSteps,
-            onlineSearch: newOnlineSearch ?? existingProblem?.onlineSearch,
+            onlineSearch: newOnlineSearch,
           };
 
           const updatedSolution = {

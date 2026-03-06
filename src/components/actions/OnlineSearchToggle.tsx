@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils.ts";
 import { Globe } from "lucide-react";
 
-interface OnlineSearchToggleProps {
+export type OnlineSearchToggleProps = {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   label: string;

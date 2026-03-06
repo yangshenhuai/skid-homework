@@ -19,13 +19,13 @@ export type ExplanationMode = "explanation" | "steps";
 
 const DEFAULT_SHORTCUTS: ShortcutMap = {
   upload: "ctrl+1",
-  textInput: "ctrl+3",
-  startScan: "ctrl+4",
-  clearAll: "ctrl+5",
+  textInput: "ctrl+i",
+  startScan: "ctrl+3",
+  clearAll: "ctrl+4",
   openSettings: "ctrl+6",
-  adbScreenshot: "ctrl+7",
-  openChat: "ctrl+e",
-  openGlobalTraitsEditor: "ctrl+x",
+  adbScreenshot: "ctrl+2",
+  openChat: "ctrl+shift+o",
+  openGlobalTraitsEditor: "ctrl+o",
 };
 
 const DEFAULT_LANGUAGE: LanguagePreference = "en";
